@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Button, Modal, Image, StyleSheet } from 'react-native';
-import { Camera } from 'expo-camera';
+import { View, Text, Button, Modal, Image, StyleSheet, Pressable, TouchableOpacity } from 'react-native';
+import { Camera,CameraType  } from 'expo-camera';
 
 const CameraButton = ({ onPhotoTaken }) => {
   const [hasPermission, setHasPermission] = useState(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
   const cameraRef = useRef(null);
+  const [type, setType] = useState(CameraType.back);
 
   useEffect(() => {
     (async () => {
@@ -37,12 +38,20 @@ const CameraButton = ({ onPhotoTaken }) => {
     setIsCameraOpen(false);
     setCapturedImage(null);
   };
-  
+
+  function toggleCameraType() {
+    setType(current => (current === CameraType.back ? CameraType.front : CameraType.back));
+  }
 
   return (
-    <View>
-      <Button title="Ouvrir la caméra" onPress={openCamera} />
-
+    <View style={styles.centeredView}>
+      <View style={styles.button}>
+        <Pressable
+          style={styles.button}
+          onPress={openCamera}>
+          <Text style={styles.textStyle}>Ouvrir la caméra</Text>
+        </Pressable>
+      </View>
       {hasPermission === null ? (
         <Text>Requesting camera permission...</Text>
       ) : hasPermission === false ? (
@@ -64,11 +73,14 @@ const CameraButton = ({ onPhotoTaken }) => {
           <Camera
             ref={cameraRef}
             style={styles.camera}
-            type={Camera.Constants.Type.back}
+            type={type}
           />
           <View style={styles.captureButtonContainer}>
             <Button title="Prendre une photo" onPress={takePicture} />
             <Button title="Annuler" onPress={closeCamera} />
+            <TouchableOpacity style={styles.button} onPress={toggleCameraType}>
+              <Text style={styles.textStyle}>Flip Camera</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -77,6 +89,11 @@ const CameraButton = ({ onPhotoTaken }) => {
 };
 
 const styles = StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   cameraContainer: {
     flex: 1,
   },
@@ -97,6 +114,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '60%',
     marginTop: 20,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 5,
+    marginTop: 3,
+    backgroundColor: '#da70d6',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 

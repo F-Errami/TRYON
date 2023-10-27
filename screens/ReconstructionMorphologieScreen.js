@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Modal, Alert, Pressable } from 'react-native';
 import CameraButton from '../components/CameraButton'; // Import the CameraButton component
 
 const ReconstructionMorphologieScreen = () => {
@@ -21,26 +21,24 @@ const ReconstructionMorphologieScreen = () => {
           hideModal();
         }}
       >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>Here are the instructions to add a new morphologie!</Text>  
-            <Text style={styles.modalText}>- Take a picture of your face</Text>
-            <Text style={styles.modalText}>- Put your measures after</Text>
-            <Pressable
-              style={[styles.button, styles.buttonClose]}
-              onPress={() => setModalVisible(!modalVisible)}>
-              <Text style={styles.textStyle}>Hide Instructions</Text>
-            </Pressable>
-          </View>
+        <View style={styles.modalView}>
+          <Text style={styles.modalText}>Voici les instructions pour ajouter une nouvelle morphologie!</Text>
+          <Text style={styles.modalText}>- Prends une photo de ton visage</Text>
+          <Text style={styles.modalText}>- Mets tes mesures dans le formulaire </Text>
+          <Pressable
+            style={[styles.button, styles.buttonClose]}
+            onPress={() => setModalVisible(!modalVisible)}>
+            <Text style={styles.textStyle}>Fermer</Text>
+          </Pressable>
         </View>
       </Modal>
       <Pressable
         style={[styles.button, styles.buttonOpen]}
         onPress={() => setModalVisible(true)}>
-        <Text style={styles.textStyle}>Show Instructions</Text>
+        <Text style={styles.textStyle}> ? </Text>
       </Pressable>
 
-      <CameraButton onPhotoTaken={onPhotoTaken} /> 
+      <CameraButton onPhotoTaken={onPhotoTaken} />
     </View>
   );
 }
@@ -51,11 +49,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 22,
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   modalView: {
     margin: 20,
@@ -78,7 +71,10 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   buttonOpen: {
-    backgroundColor: '#F194FF',
+    position:'absolute',
+    top:0,
+    right:0,
+    backgroundColor: '#da70d6',
   },
   buttonClose: {
     backgroundColor: '#2196F3',
