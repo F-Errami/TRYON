@@ -1,8 +1,14 @@
-import React , { useState } from 'react';
-import { View, Text, StyleSheet, Modal,Alert,Pressable } from 'react-native';
+
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import CameraButton from '../components/CameraButton'; // Import the CameraButton component
 
 const ReconstructionMorphologieScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
+  const onPhotoTaken = (photo) => {
+    // Handle the captured photo here, e.g., save it, display it, etc.
+  };
+
   return (
     <View style={styles.container}>
       <Modal
@@ -33,6 +39,8 @@ const ReconstructionMorphologieScreen = () => {
         onPress={() => setModalVisible(true)}>
         <Text style={styles.textStyle}>Show Instructions</Text>
       </Pressable>
+
+      <CameraButton onPhotoTaken={onPhotoTaken} /> 
     </View>
   );
 }
