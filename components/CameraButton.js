@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Button, Modal, Image, StyleSheet, Pressable, TouchableOpacity } from 'react-native';
+import { View, Text, Button, Modal, Image, StyleSheet, Pressable, TouchableOpacity, TextInput ,Alert} from 'react-native';
 import { Camera, CameraType } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system';
@@ -10,6 +10,8 @@ const CameraButton = ({ onPhotoTaken }) => {
   const [capturedImage, setCapturedImage] = useState(null);
   const cameraRef = useRef(null);
   const [type, setType] = useState(CameraType.back);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [name, onChangeName] = React.useState('');
 
   useEffect(() => {
     (async () => {
@@ -41,16 +43,16 @@ const CameraButton = ({ onPhotoTaken }) => {
     setIsCameraOpen(false);
     setCapturedImage(null);
     requestPermissions();
-    saveToGallery(capturedImage.uri);
+    setModalVisible(true);
   };
 
-  const saveToGallery = async (imageUri) => {
-
+  const saveToGallery = async (imageUri, imageName) => {
+    setModalVisible(false)
     if (imageUri) {
       const asset = await MediaLibrary.createAssetAsync(imageUri);
-      const album = await MediaLibrary.getAlbumAsync('Nom de l\'album');
+      const album = await MediaLibrary.getAlbumAsync(imageName);
       if (album === null) {
-        await MediaLibrary.createAlbumAsync('Nom de l\'album', asset, false);
+        await MediaLibrary.createAlbumAsync(imageName, asset, false);
       } else {
         await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
       }
@@ -97,7 +99,41 @@ const CameraButton = ({ onPhotoTaken }) => {
             <Button title="Valider" onPress={validatePicture} />
             <Button title="Reprendre" onPress={retakePicture} />
           </View>
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={isModalVisible}
+            onRequestClose={() =>setModalVisible(!isModalVisible)}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text
+                  style={styles.textStyle}> Veuillez entrer le nom de l'image
+                </Text>
+                <TextInput
+                  style={styles.textStyle}
+                  onChangeText={onChangeName}
+                  value={name}
+                  placeholder='nom'
+                  placeholderTextColor={'gray'}
+                />
+                <Pressable
+                  style={styles.button}
+                  onPress={() => {
+                    Alert.alert(name + ' hehe ' +capturedImage.uri);
+                    saveToGallery(capturedImage.uri, name)}}>
+                  <Text style={styles.textStyle}>Valider</Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.button]}
+                  onPress={() => setModalVisible(!isModalVisible)}>
+                  <Text style={styles.textStyle}>Fermer</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>
         </View>
+
       ) : null}
 
       <Modal visible={isCameraOpen && !capturedImage} animationType="slide">
@@ -125,6 +161,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  modalView: {
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    backgroundColor: '#00BFFF',
+    borderRadius: 50,
+    paddingHorizontal: 15,
+    paddingTop: 15,
+    paddingBottom: 15,
+    elevation: 30,
   },
   cameraContainer: {
     flex: 1,
