@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, Button, Modal, Image, StyleSheet, Pressable, TouchableOpacity } from 'react-native';
-import { Camera,CameraType  } from 'expo-camera';
+import { Camera, CameraType } from 'expo-camera';
+import * as MediaLibrary from 'expo-media-library';
+import * as FileSystem from 'expo-file-system';
 
 const CameraButton = ({ onPhotoTaken }) => {
   const [hasPermission, setHasPermission] = useState(null);
@@ -34,14 +36,44 @@ const CameraButton = ({ onPhotoTaken }) => {
   const retakePicture = () => {
     setCapturedImage(null);
   };
+
   const validatePicture = () => {
     setIsCameraOpen(false);
     setCapturedImage(null);
+    requestPermissions();
+    saveToGallery(capturedImage.uri);
+  };
+
+  const saveToGallery = async (imageUri) => {
+
+    if (imageUri) {
+      const asset = await MediaLibrary.createAssetAsync(imageUri);
+      const album = await MediaLibrary.getAlbumAsync('Nom de l\'album');
+      if (album === null) {
+        await MediaLibrary.createAlbumAsync('Nom de l\'album', asset, false);
+      } else {
+        await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+      }
+    }
   };
 
   function toggleCameraType() {
     setType(current => (current === CameraType.back ? CameraType.front : CameraType.back));
-  }
+  };
+
+  const requestPermissions = async () => {
+    const cameraPermission = await Permissions.askAsync(Permissions.CAMERA);
+    const mediaLibraryPermission = await Permissions.askAsync(Permissions.MEDIA_LIBRARY);
+
+    if (
+      cameraPermission.status !== 'granted' ||
+      mediaLibraryPermission.status !== 'granted'
+    ) {
+      console.error('Les autorisations nécessaires n\'ont pas été accordées.');
+      return;
+    }
+    setHasPermission(mediaLibraryPermission === 'granted');
+  };
 
   return (
     <View style={styles.centeredView}>
