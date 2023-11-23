@@ -2,11 +2,25 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal, Alert, Pressable } from 'react-native';
 import CameraButton from '../components/CameraButton'; // Import the CameraButton component
+import Formulaire from './Formulaire';
 
 const ReconstructionMorphologieScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [formVisible, setFormVisible] = useState(false);
+  const [submittedFormData, setSubmittedFormData] = useState(null);
+
   const onPhotoTaken = (photo) => {
     // Handle the captured photo here, e.g., save it, display it, etc.
+  };
+
+  const handleFormClose = (value) => {
+    setFormVisible(value);
+  };
+
+  const handleFormSubmit = (data) => {
+    console.log('Data from Form:', data);
+    setSubmittedFormData(data);
+    setFormVisible(false);
   };
 
   return (
@@ -36,7 +50,16 @@ const ReconstructionMorphologieScreen = () => {
         <Text style={styles.textStyle}> ? </Text>
       </Pressable>
 
-      <CameraButton onPhotoTaken={onPhotoTaken} />
+      <View>
+        <CameraButton onPhotoTaken={onPhotoTaken} />
+      </View>
+
+      <Pressable
+        style={[styles.buttonForm]}
+        onPress={() => setFormVisible(true)}>
+        <Text style={styles.textStyle}> Ajouter une morphologie </Text>
+      </Pressable>
+      <Formulaire formVisible={formVisible} onCloseForm={handleFormClose} onSubmit={handleFormSubmit} />
     </View>
   );
 }
@@ -47,6 +70,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 22,
+    flexDirection: 'row',
   },
   modalView: {
     margin: 20,
@@ -69,9 +93,9 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   buttonOpen: {
-    position:'absolute',
-    top:0,
-    right:0,
+    position: 'absolute',
+    top: 0,
+    right: 0,
     backgroundColor: '#da70d6',
   },
   buttonClose: {
@@ -85,6 +109,13 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: 'center',
+  },
+  buttonForm: {
+    borderRadius: 20,
+    padding: 12,
+    marginTop: 3,
+    marginLeft: 20, 
+    backgroundColor: '#da70d6',
   },
 });
 
