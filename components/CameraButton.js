@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Button, Modal, Image, StyleSheet, Pressable, TouchableOpacity, TextInput ,Alert} from 'react-native';
+import { View, Text, Button, Modal, Image, StyleSheet, Pressable, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { Camera, CameraType } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
-import * as FileSystem from 'expo-file-system';
+import * as Permissions from 'expo-permissions';
 
 const CameraButton = ({ onPhotoTaken }) => {
   const [hasPermission, setHasPermission] = useState(null);
@@ -13,9 +13,28 @@ const CameraButton = ({ onPhotoTaken }) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [name, onChangeName] = React.useState('');
 
+  const YourComponent = () => {
+    const [permissionResponse, requestMediaPermission] = MediaLibrary.usePermissions();
+
+    useEffect(() => {
+      // You can check the current permission status here
+      console.log('Permission Status:', permissionResponse.status);
+    }, [permissionResponse]);
+
+    const handlePermissionRequest = async () => {
+      // Request permission when a button is pressed, for example
+      const { status } = await requestMediaPermission();
+      console.log('New Permission Status:', status);
+    };
+  }
+
   useEffect(() => {
     (async () => {
-      const { status } = await Camera.requestPermissionsAsync();
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      setHasPermission(status === 'granted');
+    })();
+    (async () => {
+      requestPermission = await mediaLibrary.req
       setHasPermission(status === 'granted');
     })();
   }, []);
@@ -42,12 +61,10 @@ const CameraButton = ({ onPhotoTaken }) => {
   const validatePicture = () => {
     setIsCameraOpen(false);
     setCapturedImage(null);
-    requestPermissions();
-    setModalVisible(true);
   };
 
   const saveToGallery = async (imageUri, imageName) => {
-    setModalVisible(false)
+    handlePermissionRequest();
     if (imageUri) {
       const asset = await MediaLibrary.createAssetAsync(imageUri);
       const album = await MediaLibrary.getAlbumAsync(imageName);
@@ -57,6 +74,7 @@ const CameraButton = ({ onPhotoTaken }) => {
         await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
       }
     }
+    console.log(imageName + ' hehe ' + imageUri)
   };
 
   function toggleCameraType() {
@@ -65,7 +83,10 @@ const CameraButton = ({ onPhotoTaken }) => {
 
   const requestPermissions = async () => {
     const cameraPermission = await Permissions.askAsync(Permissions.CAMERA);
-    const mediaLibraryPermission = await Permissions.askAsync(Permissions.MEDIA_LIBRARY);
+    const mediaLibraryPermission = await Permissions.askAsync(requestPermission);
+
+    console.log('Camera Permission Status:', cameraPermission.status);
+    console.log('Media Library Permission Status:', permissionResponse);
 
     if (
       cameraPermission.status !== 'granted' ||
@@ -74,7 +95,7 @@ const CameraButton = ({ onPhotoTaken }) => {
       console.error('Les autorisations nécessaires n\'ont pas été accordées.');
       return;
     }
-    setHasPermission(mediaLibraryPermission === 'granted');
+    setHasPermission(mediaLibraryPermission.status === 'granted');
   };
 
   return (
@@ -96,14 +117,14 @@ const CameraButton = ({ onPhotoTaken }) => {
         <View>
           <Image source={{ uri: capturedImage.uri }} style={styles.capturedImage} />
           <View style={styles.capturedImageButtons}>
-            <Button title="Valider" onPress={validatePicture} />
+            <Button title="Valider" onPress={() => setModalVisible(true)} />
             <Button title="Reprendre" onPress={retakePicture} />
           </View>
           <Modal
             animationType="fade"
             transparent={true}
             visible={isModalVisible}
-            onRequestClose={() =>setModalVisible(!isModalVisible)}
+            onRequestClose={() => setModalVisible(!isModalVisible)}
           >
             <View style={styles.centeredView}>
               <View style={styles.modalView}>
@@ -120,8 +141,11 @@ const CameraButton = ({ onPhotoTaken }) => {
                 <Pressable
                   style={styles.button}
                   onPress={() => {
-                    Alert.alert(name + ' hehe ' +capturedImage.uri);
-                    saveToGallery(capturedImage.uri, name)}}>
+                    Alert.alert(capturedImage.uri);
+                    saveToGallery(capturedImage.uri, name);
+                    validatePicture();
+                    setModalVisible(false);
+                  }}>
                   <Text style={styles.textStyle}>Valider</Text>
                 </Pressable>
                 <Pressable
