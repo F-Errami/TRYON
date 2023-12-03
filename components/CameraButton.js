@@ -3,39 +3,30 @@ import { View, Text, Button, Modal, Image, StyleSheet, Pressable, TouchableOpaci
 import { Camera, CameraType } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
 import * as Permissions from 'expo-permissions';
+import * as FileSystem from 'expo-file-system';
 
 const CameraButton = ({ onPhotoTaken }) => {
   const [hasPermission, setHasPermission] = useState(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
   const cameraRef = useRef(null);
-  const [type, setType] = useState(CameraType.back);
+  const [type, setType] = useState(Camera.Constants.Type.back);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [name, onChangeName] = React.useState('');
-
-  const YourComponent = () => {
-    const [permissionResponse, requestMediaPermission] = MediaLibrary.usePermissions();
-
-    useEffect(() => {
-      // You can check the current permission status here
-      console.log('Permission Status:', permissionResponse.status);
-    }, [permissionResponse]);
-
-    const handlePermissionRequest = async () => {
-      // Request permission when a button is pressed, for example
-      const { status } = await requestMediaPermission();
-      console.log('New Permission Status:', status);
-    };
-  }
+  const [name, onChangeName] = useState('');
+  const [capturedImageName, setCapturedImageName] = useState('');
 
   useEffect(() => {
+    const requestPermissions = async () => {
+      const cameraPermission = await Camera.requestCameraPermissionsAsync();
+      const mediaLibraryPermission = await MediaLibrary.requestPermissionsAsync();
+
+      setHasPermission(
+        cameraPermission.status === 'granted' && mediaLibraryPermission.status === 'granted'
+      );
+    };
+
     (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
-    (async () => {
-      requestPermission = await mediaLibrary.req
-      setHasPermission(status === 'granted');
+      await requestPermissions();
     })();
   }, []);
 
@@ -64,46 +55,41 @@ const CameraButton = ({ onPhotoTaken }) => {
   };
 
   const saveToGallery = async (imageUri, imageName) => {
-    handlePermissionRequest();
-    if (imageUri) {
-      const asset = await MediaLibrary.createAssetAsync(imageUri);
-      const album = await MediaLibrary.getAlbumAsync(imageName);
+    try {
+      const newPath = `${FileSystem.documentDirectory}${imageName}.jpg`;
+
+      // Move or copy the file to the desired path
+      await FileSystem.moveAsync({
+        from: imageUri,
+        to: newPath,
+      });
+
+      // Create asset from the new path
+      const asset = await MediaLibrary.createAssetAsync(newPath);
+      const album = await MediaLibrary.getAlbumAsync("Face");
+
       if (album === null) {
-        await MediaLibrary.createAlbumAsync(imageName, asset, false);
+        await MediaLibrary.createAlbumAsync("Face", asset, false);
       } else {
         await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
       }
+    } catch (error) {
+      console.error('Error:', error);
     }
-    console.log(imageName + ' hehe ' + imageUri)
   };
 
-  function toggleCameraType() {
-    setType(current => (current === CameraType.back ? CameraType.front : CameraType.back));
-  };
-
-  const requestPermissions = async () => {
-    const cameraPermission = await Permissions.askAsync(Permissions.CAMERA);
-    const mediaLibraryPermission = await Permissions.askAsync(requestPermission);
-
-    console.log('Camera Permission Status:', cameraPermission.status);
-    console.log('Media Library Permission Status:', permissionResponse);
-
-    if (
-      cameraPermission.status !== 'granted' ||
-      mediaLibraryPermission.status !== 'granted'
-    ) {
-      console.error('Les autorisations nécessaires n\'ont pas été accordées.');
-      return;
-    }
-    setHasPermission(mediaLibraryPermission.status === 'granted');
+  const toggleCameraType = () => {
+    setType((currentType) =>
+      currentType === Camera.Constants.Type.back
+        ? Camera.Constants.Type.front
+        : Camera.Constants.Type.back
+    );
   };
 
   return (
     <View style={styles.centeredView}>
       <View style={styles.button}>
-        <Pressable
-          style={styles.button}
-          onPress={openCamera}>
+        <Pressable style={styles.button} onPress={openCamera}>
           <Text style={styles.textStyle}>Ouvrir la caméra</Text>
         </Pressable>
       </View>
@@ -128,45 +114,39 @@ const CameraButton = ({ onPhotoTaken }) => {
           >
             <View style={styles.centeredView}>
               <View style={styles.modalView}>
-                <Text
-                  style={styles.textStyle}> Veuillez entrer le nom de l'image
-                </Text>
+                <Text style={styles.textStyle}>Veuillez entrer le nom de l'image</Text>
                 <TextInput
                   style={styles.textStyle}
-                  onChangeText={onChangeName}
+                  onChangeText={(text) => onChangeName(text) && setCapturedImageName(text)}
                   value={name}
-                  placeholder='nom'
-                  placeholderTextColor={'gray'}
+                  placeholder="nom"
+                  placeholderTextColor="gray"
                 />
                 <Pressable
                   style={styles.button}
                   onPress={() => {
-                    Alert.alert(capturedImage.uri);
-                    saveToGallery(capturedImage.uri, name);
+                    saveToGallery(capturedImage.uri, capturedImageName);
                     validatePicture();
                     setModalVisible(false);
-                  }}>
+                  }}
+                >
                   <Text style={styles.textStyle}>Valider</Text>
                 </Pressable>
                 <Pressable
                   style={[styles.button]}
-                  onPress={() => setModalVisible(!isModalVisible)}>
+                  onPress={() => setModalVisible(!isModalVisible)}
+                >
                   <Text style={styles.textStyle}>Fermer</Text>
                 </Pressable>
               </View>
             </View>
           </Modal>
         </View>
-
       ) : null}
 
       <Modal visible={isCameraOpen && !capturedImage} animationType="slide">
         <View style={styles.cameraContainer}>
-          <Camera
-            ref={cameraRef}
-            style={styles.camera}
-            type={type}
-          />
+          <Camera ref={cameraRef} style={styles.camera} type={type} />
           <View style={styles.captureButtonContainer}>
             <Button title="Prendre une photo" onPress={takePicture} />
             <Button title="Annuler" onPress={closeCamera} />
