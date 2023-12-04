@@ -55,17 +55,8 @@ const CameraButton = ({ onPhotoTaken }) => {
   };
 
   const saveToGallery = async (imageUri, imageName) => {
-    try {
-      const newPath = `${FileSystem.documentDirectory}${imageName}.jpg`;
-
-      // Move or copy the file to the desired path
-      await FileSystem.moveAsync({
-        from: imageUri,
-        to: newPath,
-      });
-
-      // Create asset from the new path
-      const asset = await MediaLibrary.createAssetAsync(newPath);
+    if (imageUri) {
+      const asset = await MediaLibrary.createAssetAsync(imageUri);
       const album = await MediaLibrary.getAlbumAsync("Face");
 
       if (album === null) {
@@ -73,8 +64,6 @@ const CameraButton = ({ onPhotoTaken }) => {
       } else {
         await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
       }
-    } catch (error) {
-      console.error('Error:', error);
     }
   };
 
