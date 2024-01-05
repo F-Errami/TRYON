@@ -1,0 +1,6 @@
+opencv-python  # OpenCV library
+numpy         # Fundamental package for scientific computing
+scipy         # Scientific library (includes optimize module)
+tomlkit       # Library for working with TOML files
+tqdm          # Fast, extensible progress bar
+open3d       # Library for 3D data processing and visualization
