@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, Button, Modal, Image, StyleSheet, Pressable, TouchableOpacity, TextInput, Alert } from 'react-native';
-import { Camera, CameraType } from 'expo-camera';
+import { Camera } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
-import * as Permissions from 'expo-permissions';
-import * as FileSystem from 'expo-file-system';
+
 
 const CameraButton = ({ onPhotoTaken }) => {
   const [hasPermission, setHasPermission] = useState(null);
