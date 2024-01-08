@@ -27,6 +27,13 @@ const Formulaire = ({ formVisible, onCloseForm, onSubmit }) => {
     reset();
   }
 
+  const onResetForm = () => {
+    reset();
+  }
+
+  const onBackForm = () => {
+    onCloseForm(false);
+  }
 
   return (
     <View>
@@ -55,7 +62,7 @@ const Formulaire = ({ formVisible, onCloseForm, onSubmit }) => {
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              placeholder="Tour d'épaule"
+              placeholder="Tour d'épaule (cm)"
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
@@ -76,7 +83,7 @@ const Formulaire = ({ formVisible, onCloseForm, onSubmit }) => {
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              placeholder="Tour de poitrine"
+              placeholder="Tour de poitrine (cm)"
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
@@ -98,7 +105,7 @@ const Formulaire = ({ formVisible, onCloseForm, onSubmit }) => {
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              placeholder="Tour de taille"
+              placeholder="Tour de taille (cm)"
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
@@ -120,7 +127,7 @@ const Formulaire = ({ formVisible, onCloseForm, onSubmit }) => {
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              placeholder="Tour de hanches"
+              placeholder="Tour de hanches (cm)"
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
@@ -135,6 +142,9 @@ const Formulaire = ({ formVisible, onCloseForm, onSubmit }) => {
         )}
 
         <Button title="Submit" onPress={handleSubmit(onSubmitForm)} />
+        <Button title="Reset" onPress={onResetForm} />
+        <Button title="Back" onPress={onBackForm} />
+
       </Modal>
     </View>
   )

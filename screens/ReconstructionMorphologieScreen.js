@@ -8,7 +8,7 @@ import Formulaire from './Formulaire';
 const ReconstructionMorphologieScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
-  const [setSubmittedFormData] = useState(null);
+  const [submittedFormData,setSubmittedFormData] = useState(null);
 
   const handleFormClose = (value) => {
     setFormVisible(value);
