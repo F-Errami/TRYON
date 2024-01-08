@@ -280,12 +280,11 @@ with o3d.utility.VerbosityContextManager(
         point_cloud, depth=9)
     
 # Afficher le maillage reconstruit
-o3d.visualization.draw_geometries([mesh])
 o3d.io.write_triangle_mesh("./res/GustavIIAdolf.ply", mesh)
 print('Vertices: ',np.asarray(mesh.vertices))
 print('Triangles: ',np.asarray(mesh.triangles))
 # Computing normal and rendering it
-mesh.compute_vertex_normals()
+mesh.compute_vertex_normals() 
 o3d.visualization.draw_geometries([mesh])
 
 
