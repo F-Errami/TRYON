@@ -1,6 +1,14 @@
 # TRYON
+## Expo app
+Inside the repository run  these commands
 
-## Description
+> expo install
+
+> expo start
+
+    
+    
+## Python app
 This guide demonstrates how to set up and utilize a Python virtual environment for running the 3Dreconstruction.py .
 
 ## Installation
