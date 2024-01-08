@@ -10,11 +10,11 @@ import numpy as np
 
 class Image_loader():
     def __init__(self, img_dir:str, downscale_factor:float):
-        # loading the Camera intrinsic parameters K
+        # chargement des parametres intrinseques de la camera ( matrice de calib)
         with open(img_dir + '\\K.txt') as f:
             self.K = np.array(list((map(lambda x:list(map(lambda x:float(x), x.strip().split(' '))),f.read().split('\n')))))
             self.image_list = []
-        # Loading the set of images
+        # chargement des images
         for image in sorted(os.listdir(img_dir)):
             if image[-4:].lower() == '.jpg' or image[-5:].lower() == '.png':
                 self.image_list.append(img_dir + '\\' + image)
@@ -26,7 +26,7 @@ class Image_loader():
     
     def downscale(self) -> None:
         '''
-        Downscales the Image intrinsic parameter acc to the downscale factor
+        Redimensionne les paramètres intrinsèques de l'image selon le facteur de réduction.
         '''
         self.K[0, 0] /= self.factor
         self.K[1, 1] /= self.factor
@@ -47,7 +47,6 @@ def find_keypoints(image_0, image_1) -> tuple:
     sift = cv2.SIFT_create()
     key_points_0, desc_0 = sift.detectAndCompute(cv2.cvtColor(image_0, cv2.COLOR_BGR2GRAY), None)
     key_points_1, desc_1 = sift.detectAndCompute(cv2.cvtColor(image_1, cv2.COLOR_BGR2GRAY), None)
-
     bf = cv2.BFMatcher()
     matches = bf.knnMatch(desc_0, desc_1, k=2)
     feature = []
@@ -67,15 +66,15 @@ def triangulation(point_2d_1, point_2d_2, projection_matrix_1, projection_matrix
 
 def PnP(obj_point, image_point , K, dist_coeff, rot_vector, initial) ->  tuple:
     '''
-    Finds an object pose from 3D-2D point correspondences using the RANSAC scheme.
-    returns rotational matrix, translational matrix, image points, object points, rotational vector
+    estime la pose a partir des points 2D et 3D
+    renvoie matrice de rotation, vecteur translation, point en 3D, vecteur de rotation
     '''
     if initial == 1:
         obj_point = obj_point[:, 0 ,:]
         image_point = image_point.T
         rot_vector = rot_vector.T 
     _, rot_vector_calc, tran_vector, inlier = cv2.solvePnPRansac(obj_point, image_point, K, dist_coeff, cv2.SOLVEPNP_ITERATIVE)
-    # Converts a rotation matrix to a rotation vector or vice versa
+    # Conversion d'une matrice rotation en vecteur rotation ou vice versa
     rot_matrix, _ = cv2.Rodrigues(rot_vector_calc)
 
     if inlier is not None:
@@ -87,8 +86,8 @@ def PnP(obj_point, image_point , K, dist_coeff, rot_vector, initial) ->  tuple:
 # calcul de l'erreur
 def reprojection_error(obj_points, image_points, transform_matrix, K, homogenity) ->tuple:
     '''
-    Calculates the reprojection error ie the distance between the projected points and the actual points.
-    returns total error, object points
+    Calcule l'erreur de reprojection, c'est-à-dire la distance entre les 
+    points projetés et les points réels. Renvoie l'erreur totale et les points d'objet.
     '''
     rot_matrix = transform_matrix[:3, :3]
     tran_vector = transform_matrix[:3, 3]
@@ -102,9 +101,10 @@ def reprojection_error(obj_points, image_points, transform_matrix, K, homogenity
 
 def common_points( image_points_1, image_points_2, image_points_3) -> tuple:
     '''
-    Finds the common points between image 1 and 2 , image 2 and 3
-    returns common points of image 1-2, common points of image 2-3, mask of common points 1-2 , mask for common points 2-3 
-    '''
+    Trouve les points communs entre l'image 1 et l'image 2, ainsi qu'entre l'image 2 et l'image 3. 
+    Renvoie les points communs entre l'image 1 et l'image 2, les points communs entre l'image 2 et l'image 3,
+    la masque des points communs entre l'image 1 et l'image 2,
+    et le masque pour les points communs entre l'image 2 et l'image 3'''
     cm_points_1 = []
     cm_points_2 = []
     for i in range(image_points_1.shape[0]):
@@ -122,13 +122,12 @@ def common_points( image_points_1, image_points_2, image_points_3) -> tuple:
     mask_array_2.mask[cm_points_2] = True
     mask_array_2 = mask_array_2.compressed()
     mask_array_2 = mask_array_2.reshape(int(mask_array_2.shape[0] / 2), 2)
-    print(" Shape New Array", mask_array_1.shape, mask_array_2.shape)
     return np.array(cm_points_1), np.array(cm_points_2), mask_array_1, mask_array_2
 
 def optimal_reprojection_error( obj_points) -> np.array:
     '''
-    calculates of the reprojection error during bundle adjustment
-    returns error 
+    calcule l'erreur de reprojection 
+    renvoie l'erreur
     '''
     transform_matrix = obj_points[0:12].reshape((3,4))
     K = obj_points[12:21].reshape((3,3))
@@ -145,8 +144,8 @@ def optimal_reprojection_error( obj_points) -> np.array:
 
 def bundle_adjustment( _3d_point, opt, transform_matrix_new, K, r_error) -> tuple:
     '''
-    Bundle adjustment for the image and object points
-    returns object points, image points, transformation matrix
+    Ajustement de faisceau pour les points de l'image et de l'objet.
+    Renvoie les points de l'objet, les points de l'image, et la matrice de transformation.
     '''
     opt_variables = np.hstack((transform_matrix_new.ravel(), K.ravel()))
     opt_variables = np.hstack((opt_variables, opt.ravel()))
@@ -159,7 +158,7 @@ def bundle_adjustment( _3d_point, opt, transform_matrix_new, K, r_error) -> tupl
 
 def to_ply(path, point_cloud, colors) -> None:
     '''
-    Generates the .ply which can be used to open the point cloud
+    genere le nuage de points en .ply
     '''
     out_points = point_cloud.reshape(-1, 3) * 200
     out_colors = colors.reshape(-1, 3)
@@ -272,28 +271,29 @@ to_ply(image_file.path, total_points, total_colors)
 print("Completed Exiting ...")
 np.savetxt(image_file.path + '\\res\\' + image_file.image_list[0].split('\\')[-2]+'_pose_array.csv', pose_array, delimiter = '\n')
 
-# reconstruction avec Alpha shapes
 point_cloud = o3d.io.read_point_cloud("./res/GustavIIAdolf.ply")
 # Estimer les normales
-point_cloud.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=60))
+point_cloud.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.001, max_nn=1))
+o3d.visualization.draw_geometries([point_cloud], point_show_normal=True)
 
 # Effectuer la reconstruction de surface de Poisson
 with o3d.utility.VerbosityContextManager(
         o3d.utility.VerbosityLevel.Debug) as cm:
     mesh, densities = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(
         point_cloud, depth=9)
-print(type(mesh),type(point_cloud))
+#print(type(mesh),type(point_cloud))
+    
 # Afficher le maillage reconstruit
-#o3d.visualization.draw_geometries([mesh])
+o3d.visualization.draw_geometries([mesh])
 o3d.io.write_triangle_mesh("./res/GustavIIAdolf.ply", mesh)
-print(mesh)
-print('Vertices:')
-print(np.asarray(mesh.vertices))
-print('Triangles:')
-print(np.asarray(mesh.triangles))
-print("Computing normal and rendering it.")
+#print(mesh)
+#print('Vertices:')
+#print(np.asarray(mesh.vertices))
+#print('Triangles:')
+#print(np.asarray(mesh.triangles))
+#print("Computing normal and rendering it.")
 mesh.compute_vertex_normals()
-print(np.asarray(mesh.triangle_normals))
+#print(np.asarray(mesh.triangle_normals))
 o3d.visualization.draw_geometries([mesh])
 
 
