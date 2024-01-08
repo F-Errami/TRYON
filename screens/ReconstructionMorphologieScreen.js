@@ -1,20 +1,21 @@
-
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Modal, Alert, Pressable } from 'react-native';
-import CameraButton from '../components/CameraButton'; // Import the CameraButton component
+import { View, Text, StyleSheet, Modal, Pressable } from 'react-native';
+import CameraButton from '../components/CameraButton'; 
 import Formulaire from './Formulaire';
+
+// Méthode permettant à l'utilisateur d'ouvrir la caméra ainsi que le formulaire pour renseigner ses mesures.
 
 const ReconstructionMorphologieScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
-  const [submittedFormData, setSubmittedFormData] = useState(null);
-
-  const onPhotoTaken = (photo) => {
-    // Handle the captured photo here, e.g., save it, display it, etc.
-  };
+  const [setSubmittedFormData] = useState(null);
 
   const handleFormClose = (value) => {
     setFormVisible(value);
+  };
+
+  const onPhotoTaken = (photo) => {
+    // Méthode créee pour traiter l'image prise ultérieurement
   };
 
   const handleFormSubmit = (data) => {

@@ -1,6 +1,8 @@
 import { Text, View, TextInput, Button, Modal, StyleSheet } from "react-native"
 import { useForm, Controller } from "react-hook-form"
 
+// Méthode permettant à l'utilisateur de fournir ses mesures et de les soumettre.
+
 const Formulaire = ({ formVisible, onCloseForm, onSubmit }) => {
   const {
     control,
@@ -19,7 +21,8 @@ const Formulaire = ({ formVisible, onCloseForm, onSubmit }) => {
 
   const onSubmitForm = (data) => {
     console.log('Data submitted from Form:', data);
-    onSubmit(data); // Appel de la fonction de rappel pour transmettre les données
+    // Appel de la fonction de rappel pour transmettre les données
+    onSubmit(data); 
     onCloseForm(false);
     reset();
   }

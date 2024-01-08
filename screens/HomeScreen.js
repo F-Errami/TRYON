@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, ImageBackground, Image } from 'react-native';
 
+// Menu d'accueil de l'application 
+
 const HomeScreen = () => {
   return (
     <ImageBackground
-      source={require('../assets/images/future_wallpaper.jpg')} // Replace with your background image
+      source={require('../assets/images/future_wallpaper.jpg')} 
       style={styles.background}
     >
       <View style={styles.container}>
@@ -37,14 +39,14 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     shadowColor: 'black',
-    shadowOffset: { width: 0, height: 4 }, // Adjust shadow offset for more depth
-    shadowOpacity: 0.4, // Adjust shadow opacity for more visibility
-    elevation: 4, // Android elevation for shadow
+    shadowOffset: { width: 0, height: 4 }, 
+    shadowOpacity: 0.4, 
+    elevation: 4, 
     alignItems: 'center',
-    minHeight: 400, // Adjust card height as needed
+    minHeight: 400, 
   },
   logo: {
-    width: 150, // Adjust the size as needed
+    width: 150, 
     height: 150,
     marginBottom: 20,
   },

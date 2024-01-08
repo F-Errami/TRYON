@@ -3,11 +3,16 @@ import { View, Text, StyleSheet, Modal, Pressable } from 'react-native';
 import VideoButton from '../components/VideoButton';
 
 
+/**
+  * Cette méthode permet de capturer une vidéo et de la visionner.
+  * L'objectif est d'utiliser cette vidéo ultérieurement pour reconstruire l'objet à partir d'angles différents.
+ */
+
 const ReconstructionVetementScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
 
-  const onPhotoTaken = (photo) => {
-    // Handle the captured photo here, e.g., save it, display it, etc.
+  const onVideoTaken = (video) => {
+    // Méthode créee pour traiter la vidéo prise ultérieurement
   };
 
   return (
@@ -38,7 +43,7 @@ const ReconstructionVetementScreen = () => {
       </Pressable>
 
       <View>
-        <VideoButton onPhotoTaken={onPhotoTaken} />
+        <VideoButton onVideoTaken={onVideoTaken} />
       </View> 
     </View>
   );

@@ -3,6 +3,11 @@ import { StyleSheet, Text, View, Button } from 'react-native';
 import { Camera } from 'expo-camera';
 import { Video } from 'expo-av';
 
+/**
+ * Composant VideoButton : Permet d'enregistrer des vidéos à l'aide de la caméra.
+ * @param {Function} onVideoTaken - Fonction de rappel appelée lorsque la vidéo est enregistrée.
+ */
+
 const VideoButton = ({ onVideoTaken }) => {
   const [hasAudioPermission, setHasAudioPermission] = useState(null);
   const [hasCameraPermission, setHasCameraPermission] = useState(null);
@@ -13,6 +18,7 @@ const VideoButton = ({ onVideoTaken }) => {
   const [status, setStatus] = React.useState({});
 
   useEffect(() => {
+    // Demande les autorisations pour la caméra et le microphone
     (async () => {
       const cameraStatus = await Camera.requestCameraPermissionsAsync();
       setHasCameraPermission(cameraStatus.status === 'granted');

@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Button, Modal, Image, StyleSheet, Pressable, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, Button, Modal, Image, StyleSheet, Pressable, TouchableOpacity, TextInput } from 'react-native';
 import { Camera } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
 
+// Méthode qui permet de gérer la capture d'une image
 
 const CameraButton = ({ onPhotoTaken }) => {
+  // State et références pour la gestion de la caméra et des images
+
   const [hasPermission, setHasPermission] = useState(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
@@ -13,6 +16,8 @@ const CameraButton = ({ onPhotoTaken }) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [name, onChangeName] = useState('');
   const [capturedImageName, setCapturedImageName] = useState('');
+
+  // Vérification et demande des permissions de la caméra et de la bibliothèque média
 
   useEffect(() => {
     const requestPermissions = async () => {

@@ -2,8 +2,12 @@ import React, { Suspense } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Canvas, useFrame } from '@react-three/fiber';
 
+/** 
+  * Cette méthode concerne l'affichage du modèle 3D, pour le moment il n'est pas complet car nous avons eu des soucis
+  * Il y a seulement la scène 3D avec un exemple d'objet.
+*/
 
-
+// Permet de créer un objet 3D
 const Box = () => {
   useFrame(({ scene }) => {
     const box = scene.getObjectByName('box')
@@ -19,6 +23,7 @@ const Box = () => {
   )
 }
 
+// Affichage de l'objet 3D
 const EssayageVetementScreen = () => {
   return (
     <View style={styles.container}>
