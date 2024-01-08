@@ -2,8 +2,14 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
+/**
+ * Composant Menu : Affiche le menu de navigation de l'application.
+ * Permet de naviguer entre différentes sections.
+ */
 const Menu = () => {
   const navigation = useNavigation();
+
+  // Fonctions de navigation vers différentes sections de l'application
 
   const navigateToReconstructionMorphologie = () => {
     navigation.navigate('Reconstruction Morphologie');
